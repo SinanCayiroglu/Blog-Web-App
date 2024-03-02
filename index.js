@@ -43,8 +43,16 @@ app.get("/contact", (req, res) => {
     res.render("create.ejs")
   });
 
+  app.get("/project", (req, res) => {
+    res.render("project.ejs")
+  });
+
   app.get("/success", (req, res) => {
     res.render("success.ejs")
+  });
+
+  app.get("/javacalc", (req, res) => {
+    res.render("javacalc.ejs")
   });
 
 app.post("/check", (req, res) => {

@@ -1,0 +1,54 @@
+<%- include("partials/header.ejs") %>
+
+<script>
+    function calculate() {
+        var firstNumber = parseFloat(document.getElementById('firstNumber').value);
+        var operation = document.getElementById('operation').value;
+        var secondNumber = parseFloat(document.getElementById('secondNumber').value);
+
+        var resultElement = document.getElementById('result');
+
+        if (isNaN(firstNumber) || isNaN(secondNumber)) {
+            resultElement.innerHTML = "Please enter valid numbers.";
+        } else {
+            switch (operation) {
+                case '+':
+                    resultElement.innerHTML = `Result: ${firstNumber + secondNumber}`;
+                    break;
+                case '-':
+                    resultElement.innerHTML = `Result: ${firstNumber - secondNumber}`;
+                    break;
+                case '*':
+                    resultElement.innerHTML = `Result: ${firstNumber * secondNumber}`;
+                    break;
+                case '/':
+                    if (secondNumber !== 0) {
+                        resultElement.innerHTML = `Result: ${firstNumber / secondNumber}`;
+                    } else {
+                        resultElement.innerHTML = "Cannot divide by zero.";
+                    }
+                    break;
+                default:
+                    resultElement.innerHTML = "Invalid operation. Please enter +, -, *, or /";
+            }
+        }
+    }
+</script>
+
+<form>
+    <label for="firstNumber">First Number:</label>
+    <input type="number" id="firstNumber" required>
+
+    <label for="operation">Operation (+, -, *, /):</label>
+    <input type="text" id="operation" required>
+
+    <label for="secondNumber">Second Number:</label>
+    <input type="number" id="secondNumber" required>
+
+    <button type="button" onclick="calculate()">Calculate</button>
+
+    <label for="result">Result:</label>
+    <div id="result"></div>
+</form>
+
+<%- include("partials/footer.ejs") %>
