@@ -1,17 +1,14 @@
 import express from "express";
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
-import _ from "lodash";
 import ejs from "ejs";
 
 const app = express();
 const port = 3000;
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const API_URL = "http://localhost:3000";
 var userIsAuthorised = false;
-const posts = [];
-const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
-
+const loginDetail = [{username:"admin",password:"123456"}];
+const posts = [{id:1,author:"Author",title:"Title",content:"Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing."},
+{id:2,author:"Author2",title:"Title2",content:"Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing."}];
 
 app.set('view engine', 'ejs');
 
@@ -23,7 +20,6 @@ app.use(express.static("public"))
 app.get("/", (req, res) => {
     
     res.render("index.ejs", {
-        startingContent: homeStartingContent,
         posts: posts})
   });
 
@@ -36,7 +32,39 @@ app.get("/contact", (req, res) => {
   });
 
   app.get("/login", (req, res) => {
-    res.render("login.ejs")
+    res.render("login.ejs");
+  });
+
+  app.post("/login", (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const user = loginDetail.find((user) => user.username === username && user.password === password);
+
+    if (user) {
+      userIsAuthorised=true
+      res.redirect("/");
+    } else {
+      res.render("login.ejs", { errorMessage: "Invalid credentials. Please try again." });
+    }
+    res.render("login.ejs");
+
+  });
+
+  app.get("/signup", (req, res) => {
+    res.render("signup.ejs");
+  });
+  
+  app.post("/signup", (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const userExists = loginDetail.some((user) => user.username === username);
+
+    if (userExists) {
+      res.send("Username already exists. Choose another username.");
+    } else {
+      loginDetail.push({ username, password });
+      res.redirect("/"); 
+    }
   });
 
   app.get("/create", (req, res) => {
@@ -51,48 +79,118 @@ app.get("/contact", (req, res) => {
     res.render("success.ejs")
   });
 
+  app.get("/unautharized", (req, res) => {
+    res.render("unautharized.ejs")
+  });
+
   app.get("/javacalc", (req, res) => {
     res.render("javacalc.ejs")
   });
 
-app.post("/check", (req, res) => {
-    var pwd = req.body.password;
-    var usd=req.body.username
-    if (pwd === "123456" && usd==="admin") {
-        res.redirect("");
-    } 
-    else {
-        res.redirect("login.ejs");
-    }
-    
+  app.get('/search', (req, res) => {
+    const searchTerm = req.query.searchTerm || '';
+    const searchResults = posts.filter(post =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  
+    res.render('searchResults', { searchResults, searchTerm });
   });
 
+
+
+
 app.post("/create",(req,res)=>{
+  if(userIsAuthorised){
     const post = {
-        title: req.body.postTitle,
-        content: req.body.postBody
+        author: req.body.author,
+        title: req.body.title,
+        content: req.body.content
       };
     
       posts.push(post);
     
-      res.redirect("/success");
+      res.redirect("/success");}
+      else {
+      res.redirect("/unautharized")}
   })
   
-  app.get("/posts/:postName", function(req, res){
-    const requestedTitle = _.lowerCase(req.params.postName);
+  app.get("/posts/:idnumber", function(req, res){
   
-    posts.forEach(function(post){
-      const storedTitle = _.lowerCase(post.title);
+      const requestedId = parseInt(req.params.idnumber);
+      const post = posts.find(post => post.id === requestedId);
   
-      if (storedTitle === requestedTitle) {
+      if (post) {
         res.render("post", {
+          author:post.author,
           title: post.title,
           content: post.content
         });
       }
     });
   
-  });
+
+
+// ... (your existing code)
+
+// Add the following routes for editing and deleting posts:
+
+// Edit post route
+app.get("/edit/:postname", function(req, res){
+  const requestedTitle = req.params.postname;
+
+  const postToEdit = posts.find(post => post.title === requestedTitle);
+
+  if (postToEdit) {
+      res.render("edit", {
+          post: postToEdit
+      });
+  } else {
+      // Handle post not found
+      res.redirect("/");
+  }
+});
+
+// Update post route (after editing)
+app.post("/update/:postname", function(req, res){
+  const requestedTitle = req.params.postname;
+
+  const postIndex = posts.findIndex(post => post.title === requestedTitle);
+
+  if (postIndex !== -1) {
+      // Update the post with new data
+      posts[postIndex] = {
+          author: req.body.author,
+          title: req.body.title,
+          content: req.body.content
+      };
+
+      res.redirect(`/posts/${req.body.title}`);
+  } else {
+      // Handle post not found
+      res.redirect("/");
+  }
+});
+
+// Delete post route
+app.post("/delete/:postname", function(req, res){
+  const requestedTitle = req.params.postname;
+
+  const postIndex = posts.findIndex(post => post.title === requestedTitle);
+
+  if (postIndex !== -1) {
+      // Remove the post from the array
+      posts.splice(postIndex, 1);
+      res.redirect("/");
+  } else {
+      // Handle post not found
+      res.redirect("/");
+  }
+});
+
+// ... (your existing code)
+
+
 app.post("/submit",(req,res)=>{
 
 })
