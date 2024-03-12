@@ -35,6 +35,10 @@ app.get("/contact", (req, res) => {
     res.render("login.ejs");
   });
 
+  app.get("/successful-login", (req, res) => {
+    res.render("successful-login.ejs");
+  });
+
   app.post("/login", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -42,7 +46,7 @@ app.get("/contact", (req, res) => {
 
     if (user) {
       userIsAuthorised=true
-      res.redirect("/");
+      res.redirect("successful-login");
     } else {
       res.render("login.ejs", { errorMessage: "Invalid credentials. Please try again." });
     }
