@@ -10,7 +10,7 @@
         <h1><%=post.title%></h1>
         <h2><%=post.author%></h2>
         <p>
-        <%=post.content.substring(0, 100) + " ..."%>
+        <%=post.content.substring(0, 200) + " ..."%>
         <a href="/posts/<%=post.id%>">Read More</a>
         </p>
     
@@ -19,9 +19,9 @@
             <a href="/create">Create a new post</a>
         </button>
         <button type="button" class="btn btn-outline-dark btn-sm">
-            <a href="/edit/<%= post.title %>">Edit</a>
+            <a href="/edit/<%= post.id %>">Edit</a>
         </button>
-        <form action="/delete/<%= post.title %>" method="post" style="display: inline-block;">
+        <form action="/delete/<%= post.id %>" method="post" style="display: inline-block;">
             <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
         </form>
     <% }) %>

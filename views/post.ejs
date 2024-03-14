@@ -7,9 +7,9 @@
     <a href="/create">Create a new post</a>
 </button>
 <button type="button" class="btn btn-outline-dark btn-sm">
-    <a href="/edit/<%= title %>">Edit</a>
+    <a href="/edit/<%= id %>">Edit</a>
 </button>
-<form action="/delete/<%= title %>" method="post" style="display: inline-block;">
+<form action="/delete/<%= id %>" method="post" style="display: inline-block;">
     <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
 </form>
 </div>
