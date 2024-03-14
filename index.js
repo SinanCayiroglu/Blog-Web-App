@@ -128,6 +128,7 @@ app.post("/create",(req,res)=>{
   
       if (post) {
         res.render("post", {
+          id:requestedId,
           author:post.author,
           title: post.title,
           content: post.content
@@ -142,10 +143,9 @@ app.post("/create",(req,res)=>{
 // Add the following routes for editing and deleting posts:
 
 // Edit post route
-app.get("/edit/:postname", function(req, res){
-  const requestedTitle = req.params.postname;
-
-  const postToEdit = posts.find(post => post.title === requestedTitle);
+app.get("/edit/:idnumber", function(req, res){
+  const requestedId = parseInt(req.params.idnumber);
+      const postToEdit = posts.find(post => post.id === requestedId);
 
   if (postToEdit) {
       res.render("edit", {
@@ -158,32 +158,32 @@ app.get("/edit/:postname", function(req, res){
 });
 
 // Update post route (after editing)
-app.post("/update/:postname", function(req, res){
-  const requestedTitle = req.params.postname;
-
-  const postIndex = posts.findIndex(post => post.title === requestedTitle);
-
+app.post("/update/:idnumber", function(req, res){
+    const requestedId = parseInt(req.params.idnumber);
+  const postIndex = posts.findIndex(post => post.id === requestedId);
+  if(userIsAuthorised){
   if (postIndex !== -1) {
       // Update the post with new data
       posts[postIndex] = {
+        id: requestedId,
           author: req.body.author,
           title: req.body.title,
           content: req.body.content
       };
 
-      res.redirect(`/posts/${req.body.title}`);
+      res.redirect(`/posts/${requestedId}`);
   } else {
       // Handle post not found
       res.redirect("/");
-  }
+  }}else res.redirect("/unautharized")
 });
 
 // Delete post route
-app.post("/delete/:postname", function(req, res){
-  const requestedTitle = req.params.postname;
+app.post("/delete/:idnumber", function(req, res){
+  const requestedId = parseInt(req.params.idnumber);
 
-  const postIndex = posts.findIndex(post => post.title === requestedTitle);
-
+  const postIndex = posts.findIndex(post => post.id === requestedId);
+  if(userIsAuthorised){
   if (postIndex !== -1) {
       // Remove the post from the array
       posts.splice(postIndex, 1);
@@ -191,7 +191,7 @@ app.post("/delete/:postname", function(req, res){
   } else {
       // Handle post not found
       res.redirect("/");
-  }
+  }}else res.redirect("/unautharized")
 });
 
 // ... (your existing code)
